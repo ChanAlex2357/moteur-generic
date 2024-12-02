@@ -1,0 +1,10 @@
+# TODO
+
+## Environnement
+
+- [x]  Creation de repo git ( 3 )
+- [x]  Cloner le repo ( 3 )
+- [x]  Creation d’un script de deployement ( 10 )
+  - [x]  Compilation du projet
+  - [x]  Compression en jar
+  - [x]  Copier vers le dossier de dployement
