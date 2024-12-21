@@ -18,7 +18,7 @@ public class RessourceLoader {
     }
 
     private String getFullPath(String file) {
-        return PathConstant.RESSOURCE_PATH +"/"+file;
+        return PathUtils.getPathOnContext(PathConstant.RESSOURCE_PATH +"/"+file);
     }
 
     /**
