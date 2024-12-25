@@ -63,7 +63,6 @@ public class AttributeUtils {
         String name = null;
 
         if (annotation instanceof Id) {
-            System.out.println("ID?");
             name = ((Id)annotation).name();
         }
         else if (annotation instanceof Attribute) {

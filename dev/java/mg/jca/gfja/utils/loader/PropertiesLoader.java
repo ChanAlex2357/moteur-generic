@@ -10,7 +10,6 @@ public class PropertiesLoader {
     private static Properties properties;
 
     protected static void setProperties() throws Exception {
-        System.out.println("Setting properties ...");
         Properties  properties = new Properties();
         try (FileInputStream input = new FileInputStream(System.getProperty("user.dir") + java.io.File.separator + PathConstant.RESSOURCE_PATH + java.io.File.separator + PathConstant.PROPERTIES_FILE)) {
             properties.load(input);

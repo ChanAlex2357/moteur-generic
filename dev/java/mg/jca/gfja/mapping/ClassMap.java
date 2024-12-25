@@ -46,7 +46,7 @@ public abstract class ClassMap {
         preparedValues += ")";
         query += cols+" values "+preparedValues;
         
-        System.out.println("INSERT QUERY : "+query);
+        // System.out.println("INSERT QUERY : "+query);
         int inserted = 0;
         try (PreparedStatement preparedStatement = conn.prepareStatement(query);) {
             mapValues(champs, preparedStatement);

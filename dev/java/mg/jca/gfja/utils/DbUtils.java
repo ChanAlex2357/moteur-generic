@@ -20,8 +20,6 @@ public class DbUtils {
                 throw new SQLException("User or password is null");
             }
             conn = DriverManager.getConnection(getDbUrl(), user, pass);
-            System.out.println("Connection established succesfully !");
-            
         } catch (Exception e) {
             System.out.println("Error while loading connection ...");
             e.printStackTrace();
