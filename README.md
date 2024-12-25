@@ -26,4 +26,4 @@ ant -f deploy.xml
 
 ## Usage
 
-Pour commencer a utiliser la librairie dans votre projet veuillez consulter [la documentation d'utilisation](./Usage.md)
+Pour commencer a utiliser la librairie dans votre projet veuillez consulter [la documentation d'utilisation](./docs/Usage.md)
