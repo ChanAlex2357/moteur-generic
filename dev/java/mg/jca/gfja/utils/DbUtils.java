@@ -3,7 +3,7 @@ package mg.jca.gfja.utils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
+import mg.jca.gfja.utils.loader.PropertiesLoader;
 
 public class DbUtils {
     
@@ -17,17 +17,12 @@ public class DbUtils {
         if (user == null || pass == null) {
             throw new SQLException("User or password is null");
         }
-        return DriverManager.getConnection(getFullUrl(), user, pass);
+        return DriverManager.getConnection(getDbUrl(), user, pass);
     }
 
-    public Connection getConn() throws SQLException {
+    public Connection getConn() throws Exception {
         return getConn(getUSER(), getPASS());
     }
-
-    protected String getFullUrl() throws Exception {
-        return getDbUrl() + getDATABASE();
-    }
-
     public String getUSER() throws Exception {
         return PropertiesLoader.getProperty("db.user");
     }
@@ -36,10 +31,7 @@ public class DbUtils {
         return PropertiesLoader.getProperty("db.pass");
     }
 
-    public String getDATABASE()throws Exception {
-        return PropertiesLoader.getProperty("db.database");
-    }
-    public String getDbUrl() {
+    public String getDbUrl() throws Exception {
         return PropertiesLoader.getProperty("db.url");
     }
 }
