@@ -57,7 +57,7 @@ public class Champ {
     
     public void setName(){
         String name  = AttributeUtils.getAttributeName(this.getAttributeAnnotation());
-        if (name == null) {
+        if (name == null || name  == "" || name.length() == 0) {
             name = field.getName();
         }
         setName(name);
