@@ -5,24 +5,31 @@ import java.lang.reflect.Type;
 import java.lang.annotation.Annotation;
 
 import mg.jca.gfja.annotations.Id;
+import mg.jca.gfja.exception.dao.NotChampException;
 import mg.jca.gfja.utils.AttributeUtils;
 
 public class Champ {
     
     
-    public Champ (Field field) {
+    public Champ( Object source,Field field) throws NotChampException, IllegalArgumentException, IllegalAccessException {
         // recuperer le nom du champ
         Annotation attributeAnnotation = AttributeUtils.isAttribute(field);
+        setParentObject(source);
         if (attributeAnnotation == null ) {
-            // throw    
+            throw new NotChampException(this.getParentClass(),field);
         }
         setAttributeAnnotation(attributeAnnotation);
         setField(field);
         setName();
         setPrimarykey();
-    }
-    
-    protected void setPrimarykey(){
+        setValue();
+        }
+        
+        private void setValue() throws IllegalArgumentException, IllegalAccessException {
+            getValueFrom(this.getParentObject());
+        }
+        
+            protected void setPrimarykey(){
         if (this.getAttributeAnnotation() instanceof Id) {
             makePrimaryKey();
         }
@@ -32,6 +39,8 @@ public class Champ {
     }
 
     private Annotation attributeAnnotation;
+    private Object parentObject;
+    private Class<?> parentClass;
     private Field field;
     private String name;
     private Class<?> fieldType;
@@ -80,11 +89,14 @@ public class Champ {
     }
 
     public Object getValue() {
-        return value;
+        return this.value;
     }
 
     public void getValueFrom(Object source) throws IllegalArgumentException, IllegalAccessException{
-        this.setValue(field.get(source));
+        field.setAccessible(true);
+        Object value = field.get(source);
+        this.setValue(value);
+        field.setAccessible(false);
     }
     public void setValue(Object value) {
         this.value = value;
@@ -96,5 +108,22 @@ public class Champ {
 
     public void setPrimarykey(boolean primarykey) {
         this.primarykey = primarykey;
+    }
+
+    public Class<?> getParentClass() {
+        return parentClass;
+    }
+
+    public void setParentClass(Class<?> parentClass) {
+        this.parentClass = parentClass;
+    }
+
+    public Object getParentObject() {
+        return parentObject;
+    }
+
+    public void setParentObject(Object parentObject) {
+        this.parentObject = parentObject;
+        setParentClass(parentObject.getClass());
     }
 }

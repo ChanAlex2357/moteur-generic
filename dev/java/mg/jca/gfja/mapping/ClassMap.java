@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mg.jca.gfja.exception.dao.InsertionEntityException;
+import mg.jca.gfja.exception.dao.NotChampException;
 import mg.jca.gfja.utils.AttributeUtils;
 import mg.jca.gfja.utils.EntityUtils;
 
@@ -21,7 +22,7 @@ public abstract class ClassMap {
             throw new InsertionEntityException(classMap);
         }
         String tableName = EntityUtils.getEntityName(classMap,entityAnnotation);
-        Champ[] champs = getChampWithValue(classMap);
+        Champ[] champs = getChamps(classMap);
         isnertIntoTable(tableName, champs, conn);
         return classMap;
     }
@@ -31,15 +32,21 @@ public abstract class ClassMap {
         String cols = "(";
         String preparedValues = "(";
 
-        for (Champ champ : champs) {
+        for (int i = 0; i < champs.length; i++) {
+            Champ champ = champs[i];
             if (champ == null) {continue;}
-            cols += champ.getName() +",";
-            preparedValues += "?"+",";
+            String post = "";
+            if (i < champs.length -1) {
+                post = ",";
+            }
+            cols += champ.getName() +post;
+            preparedValues += "?"+post;
         }
         cols += ")";
         preparedValues += ")";
         query += cols+" values "+preparedValues;
         
+        System.out.println("INSERT QUERY : "+query);
         int inserted = 0;
         try (PreparedStatement preparedStatement = conn.prepareStatement(query);) {
             mapValues(champs, preparedStatement);
@@ -51,7 +58,9 @@ public abstract class ClassMap {
     public void mapValues(Champ[] champs , PreparedStatement preparedStatement) throws SQLException {
         int num = 1;
         for (Champ champ : champs) {
-            preparedStatement.setObject(num,champ.getValue());
+            Object value = champ.getValue();
+            preparedStatement.setObject(num,value);
+            num +=1;
         }
     }
 
@@ -69,20 +78,21 @@ public abstract class ClassMap {
         return classMap.createObject(conn);
     }
 
-    public Champ[] getChamps(ClassMap classMap) {
+    public Champ[] getChamps(ClassMap classMap) throws IllegalAccessException {
         List<Champ> champs = new ArrayList<Champ>();
         for (Field field : AttributeUtils.getAttributes(classMap.getClass())) {
-            Champ champ  =  new Champ(field);
-            champs.add(champ);        
-        }
-        return champs.toArray(new Champ[0]);
-    }
-    public Champ[] getChampWithValue(ClassMap classMap) throws IllegalArgumentException, IllegalAccessException {
-        List<Champ> champs = new ArrayList<Champ>();
-        for (Field field : AttributeUtils.getAttributes(classMap.getClass())) {
-            Champ champ  =  new Champ(field);
-            champ.getValueFrom(classMap);
-            champs.add(champ);        
+            Champ champ;
+            try {
+                champ = new Champ(classMap,field);
+                champs.add(champ);        
+            } catch (NotChampException e) {
+                // Skip for not a champ
+                continue;
+            } catch (IllegalArgumentException e) {
+                throw e;
+            } catch (IllegalAccessException e) {
+                throw e;
+            }
         }
         return champs.toArray(new Champ[0]);
     }

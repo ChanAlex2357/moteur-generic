@@ -32,5 +32,5 @@
 ## DAO
 
 [ ] Execution de requete
-    [ ] Insertion d'une entite
+    [x] Insertion d'une entite
     [ ] Update entite

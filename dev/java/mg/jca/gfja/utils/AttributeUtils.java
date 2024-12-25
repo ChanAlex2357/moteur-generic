@@ -11,7 +11,13 @@ import mg.jca.gfja.constants.AnnotationConstants;
 public class AttributeUtils {
     // Check if a field has the Attribute annotation
     public static Annotation isAttribute(Field field) {
-        return field.getAnnotation(AnnotationConstants.ATTRIBUTE_ANNOTATION);
+        
+        Annotation annotation = field.getAnnotation(AnnotationConstants.ATTRIBUTE_ANNOTATION);
+
+        if (annotation ==null) {
+            annotation = isId(field);
+        }
+        return annotation;
     }
 
     // Check if a field has the Id annotation
@@ -55,7 +61,9 @@ public class AttributeUtils {
 
     public static String getAttributeName(Annotation annotation) {
         String name = null;
+
         if (annotation instanceof Id) {
+            System.out.println("ID?");
             name = ((Id)annotation).name();
         }
         else if (annotation instanceof Attribute) {
