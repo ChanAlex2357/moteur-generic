@@ -28,3 +28,9 @@
 [x] Documentation
     [x] l'utilisation de l'annotation des class
     [x] l'utiilisation de l'annotation des attributs
+
+## DAO
+
+[ ] Execution de requete
+    [ ] Insertion d'une entite
+    [ ] Update entite

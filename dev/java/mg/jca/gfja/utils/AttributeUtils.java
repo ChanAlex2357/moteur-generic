@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import mg.jca.gfja.annotations.Attribute;
+import mg.jca.gfja.annotations.Id;
 import mg.jca.gfja.constants.AnnotationConstants;
 
 public class AttributeUtils {
@@ -49,5 +51,16 @@ public class AttributeUtils {
     // Get attributes with specified annotations
     public static List<Field> getAttributes(Class<?> clazz) {
         return AnnotationUtils.getFieldsWithAnnotations(clazz, AnnotationConstants.ATTRIBUTE_ANNOTATIONS);
+    }
+
+    public static String getAttributeName(Annotation annotation) {
+        String name = null;
+        if (annotation instanceof Id) {
+            name = ((Id)annotation).name();
+        }
+        else if (annotation instanceof Attribute) {
+            name = ((Attribute) annotation).name();
+        }
+        return name;
     }
 }
