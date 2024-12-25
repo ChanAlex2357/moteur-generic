@@ -11,16 +11,8 @@
         <delete file="${deploy.dir}/${jar.name}"/>
     </target>
 
-    <!-- Copy resources -->
-    <target name="copy-resources">
-        <echo message="Copying resources and configuration files..."/>
-        <copy todir="${bin.dir}">
-            <fileset dir="${res.dir}" includes="**/*"/>
-        </copy>
-    </target>
-
     <!-- Package task -->
-    <target name="package" depends="copy-resources">
+    <target name="package">
         <echo message="Creating JAR file..."/>
         <jar destfile="${deploy.dir}/${jar.name}" basedir="${bin.dir}"/>
     </target>
