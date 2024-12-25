@@ -6,12 +6,13 @@ import java.lang.annotation.Annotation;
 
 import mg.jca.gfja.annotations.Id;
 import mg.jca.gfja.exception.dao.NotChampException;
+import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
 import mg.jca.gfja.utils.AttributeUtils;
 
 public class Champ {
     
     
-    public Champ( Object source,Field field) throws NotChampException, IllegalArgumentException, IllegalAccessException {
+    public Champ( ClassMap source,Field field) throws NotChampException, IllegalArgumentException, IllegalAccessException, ViolationPrimaryKeyException {
         // recuperer le nom du champ
         Annotation attributeAnnotation = AttributeUtils.isAttribute(field);
         setParentObject(source);
@@ -23,15 +24,21 @@ public class Champ {
         setName();
         setPrimarykey();
         setValue();
-        }
+    }
+    
+    private void setValue() throws IllegalArgumentException, IllegalAccessException {
+        getValueFrom(this.getParentObject());
+    }
         
-        private void setValue() throws IllegalArgumentException, IllegalAccessException {
-            getValueFrom(this.getParentObject());
+    protected void setPrimarykey() throws ViolationPrimaryKeyException{
+        Champ id = this.getParentObject().getIdChamp();
+        if (id != null) {
+            throw new ViolationPrimaryKeyException(id, this);
         }
-        
-            protected void setPrimarykey(){
-        if (this.getAttributeAnnotation() instanceof Id) {
+
+        if (this.getAttributeAnnotation() instanceof Id && id == null) {
             makePrimaryKey();
+            this.getParentObject().setIdChamp(this);
         }
     }
     protected void makePrimaryKey() {
@@ -39,7 +46,7 @@ public class Champ {
     }
 
     private Annotation attributeAnnotation;
-    private Object parentObject;
+    private ClassMap parentObject;
     private Class<?> parentClass;
     private Field field;
     private String name;
@@ -118,11 +125,11 @@ public class Champ {
         this.parentClass = parentClass;
     }
 
-    public Object getParentObject() {
+    public ClassMap getParentObject() {
         return parentObject;
     }
 
-    public void setParentObject(Object parentObject) {
+    public void setParentObject(ClassMap parentObject) {
         this.parentObject = parentObject;
         setParentClass(parentObject.getClass());
     }
