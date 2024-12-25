@@ -17,20 +17,59 @@ Ce document fournit des instructions sur la façon d'utiliser la bibliothèque J
 Pour utiliser la bibliothèque, vous devez importer les classes nécessaires dans votre code Java :
 
 ```java
-import com.example.library.ClassName;
+import mg.jca.gfja.annotations.Entity;
+import mg.jca.gfja.annotations.Attribute;
+import mg.jca.gfja.annotations.Id;
+import mg.jca.gfja.utils.EntityUtils;
+import mg.jca.gfja.utils.AttributeUtils;
 ```
 
 ### Exemple de code
 
-Voici un exemple simple démontrant comment utiliser la bibliothèque :
+Voici un exemple simple démontrant comment utiliser les annotations :
 
 ```java
-import com.example.library.ClassName;
+import mg.jca.gfja.annotations.Entity;
+import mg.jca.gfja.annotations.Attribute;
+import mg.jca.gfja.annotations.Id;
+import mg.jca.gfja.utils.EntityUtils;
+import mg.jca.gfja.utils.AttributeUtils;
+
+@Entity(name = "Person")
+public class Person {
+    @Id
+    private Long id;
+
+    @Attribute(name = "firstName")
+    private String firstName;
+
+    @Attribute(name = "lastName")
+    private String lastName;
+
+    // Getters and setters
+}
 
 public class Main {
     public static void main(String[] args) {
-        ClassName instance = new ClassName();
-        instance.method();
+        Person person = new Person();
+        person.setId(1L);
+        person.setFirstName("John");
+        person.setLastName("Doe");
+
+        // Vérifier si la classe est une entité
+        if (EntityUtils.isEntity(Person.class) != null) {
+            System.out.println("Person est une entité.");
+        }
+
+        // Obtenir l'ID de l'objet
+        Object id = AttributeUtils.getId(person);
+        System.out.println("ID: " + id);
+
+        // Obtenir les attributs de l'entité
+        List<Field> attributes = AttributeUtils.getAttributes(Person.class);
+        for (Field field : attributes) {
+            System.out.println("Attribut: " + field.getName());
+        }
     }
 }
 ```
