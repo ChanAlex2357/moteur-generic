@@ -27,18 +27,19 @@ public class Champ {
     }
     
     private void setValue() throws IllegalArgumentException, IllegalAccessException {
-        getValueFrom(this.getParentObject());
+        Object value = getValueFromParent();
+        this.setValue(value);
     }
         
     protected void setPrimarykey() throws ViolationPrimaryKeyException{
         Champ id = this.getParentObject().getIdChamp();
-        if (id != null) {
-            throw new ViolationPrimaryKeyException(id, this);
-        }
-
+        
         if (this.getAttributeAnnotation() instanceof Id && id == null) {
             makePrimaryKey();
             this.getParentObject().setIdChamp(this);
+        }
+        else if (this.getAttributeAnnotation() instanceof Id && id != null) {
+            throw new ViolationPrimaryKeyException(id, this);
         }
     }
     protected void makePrimaryKey() {
@@ -99,14 +100,27 @@ public class Champ {
         return this.value;
     }
 
-    public void getValueFrom(Object source) throws IllegalArgumentException, IllegalAccessException{
+    public Object getValueFromParent() throws IllegalArgumentException, IllegalAccessException{
         field.setAccessible(true);
-        Object value = field.get(source);
-        this.setValue(value);
+        Object value = field.get(this.getParentObject());
+        field.setAccessible(false);
+        return value;
+    }
+    
+    private void setValueToParent() throws IllegalArgumentException, IllegalAccessException {
+        field.setAccessible(true);
+        this.getField().set(parentObject, this.getValue());
         field.setAccessible(false);
     }
-    public void setValue(Object value) {
+    private void setValue(Object value) {
         this.value = value;
+    }
+    public void setIdValue(Object value) throws IllegalArgumentException, IllegalAccessException{
+        Object idValue = getValueFromParent();
+        if (primarykey && idValue == null && value != null) {
+            this.setValue(value);
+            setValueToParent();
+        }
     }
 
     public boolean isPrimarykey() {

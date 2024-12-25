@@ -1,6 +1,5 @@
 package mg.jca.gfja.mapping;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -20,13 +19,15 @@ import mg.jca.gfja.utils.Utilitaire;
 public abstract class ClassMap {
     protected Champ[] champs;
     protected Champ idChamp;
+    protected String deafaultSeq;
+    protected String defaultProcedure;
 
-    private int longuerClePrimaire;
+    protected int longuerClePrimaire;
     public ClassMap() {
         longuerClePrimaire = 6;
+        deafaultSeq = "SEQ";
+        defaultProcedure =  "GET_SEQ";
     }
-
-
 
     public int insertEntity(Connection conn)throws Exception{
         // Verifier si c'est une entite
@@ -36,9 +37,18 @@ public abstract class ClassMap {
         }
         String tableName = EntityUtils.getEntityName(this,entityAnnotation);
         Champ[] champs = getChamps();
+        controllerPrimaryKey(conn);
         return isnertIntoTable(tableName, champs, conn);
     }
-
+    
+    private void controllerPrimaryKey(Connection conn) throws Exception {
+        Object pkValue = this.getIdChamp().getValue(); 
+        if ( pkValue == null) {
+            String pk = this.makePK(conn);
+            this.getIdChamp().setIdValue(pk);
+        }
+    }
+    
     public int isnertIntoTable(String tableName , Champ[] champs , Connection conn)throws Exception{
         String query = "Insert into "+tableName;
         String cols = "(";

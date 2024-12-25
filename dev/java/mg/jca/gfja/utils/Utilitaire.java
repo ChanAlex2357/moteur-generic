@@ -17,8 +17,7 @@ public class Utilitaire {
         CallableStatement cs = null;
         ResultSet rs = null;
         try {
-            cs = c.prepareCall(String
-                    .valueOf(String.valueOf((new StringBuffer("select ")).append(nomProcedure).append(" from dual"))));
+            cs = c.prepareCall(String.valueOf(String.valueOf((new StringBuffer("select ")).append(nomProcedure).append("()"))));
             rs = cs.executeQuery();
             rs.next();
             int i = rs.getInt(1);
