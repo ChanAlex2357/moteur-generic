@@ -8,3 +8,9 @@
   - [x]  Compilation du projet
   - [x]  Compression en jar
   - [x]  Copier vers le dossier de dployement
+
+## ENTITY
+
+[ ] Documentation
+    [ ] l'utilisation de l'annotation des class
+    [ ] l'utiilisation de l'annotation des attributs
