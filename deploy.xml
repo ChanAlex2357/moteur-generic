@@ -1,0 +1,40 @@
+<project name="JavaProject" default="deploy" basedir=".">
+    <property name="bin.dir" value="bin"/>
+    <property name="res.dir" value="dev/resources"/>
+    <property name="config.dir" value="dev/config"/>
+    <property name="deploy.dir" value="build"/>
+    <property name="jar.name" value="gfja.jar"/>
+    <property name="deploy-lib" value="E:\Personal Project\GFJA\test-moteur\lib"/>
+
+    <!-- Clean task -->
+    <target name="clean">
+        <echo message="Cleaning up previous deployment..."/>
+        <delete file="${deploy.dir}/${jar.name}"/>
+    </target>
+
+    <!-- Copy resources -->
+    <target name="copy-resources">
+        <echo message="Copying resources and configuration files..."/>
+        <copy todir="${bin.dir}">
+            <fileset dir="${res.dir}" includes="**/*"/>
+        </copy>
+        <copy todir="${bin.dir}">
+            <fileset dir="${config.dir}" includes="**/*"/>
+        </copy>
+    </target>
+
+    <!-- Package task -->
+    <target name="package" depends="copy-resources">
+        <echo message="Creating JAR file..."/>
+        <jar destfile="${deploy.dir}/${jar.name}" basedir="${bin.dir}"/>
+    </target>
+
+    <!-- Deploy task -->
+    <target name="deploy" depends="clean, package">
+        <echo message="Deploy jar on the deploy lib" />
+        <copy todir="${deploy-lib}">
+            <fileset dir="${deploy.dir}" includes="${jar.name}"/>
+        </copy>
+        <echo message="Deployment completed successfully."/>
+    </target>
+</project>

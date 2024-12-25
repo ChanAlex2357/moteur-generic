@@ -1,0 +1,30 @@
+# TODO
+
+## Environnement
+
+- [x]  Creation de repo git ( 3 )
+- [x]  Cloner le repo ( 3 )
+- [x]  Creation d’un script de deployement ( 10 )
+  - [x]  Compilation du projet
+  - [x]  Compression en jar
+  - [x]  Copier vers le dossier de dployement
+
+## ENTITY
+
+[x] Annotations
+    [x] class (entity)
+        [x] props name
+    [x] attributs (Attribute)
+        [x] props name
+    [x] attributs  (Id)
+[x] Manipulation des annotations
+    [x] Class AnnotationUtils
+        [x] Extraction des annotations GFJA
+        [x] isEntity(Class) -> Annotation
+            [x] Verifie si il y a l'annotation Entity
+        [x] isAttribute(Field) -> Annotation
+        [x] isId(Field) -> Annotation
+        [x] getId(Class) -> Field
+[x] Documentation
+    [x] l'utilisation de l'annotation des class
+    [x] l'utiilisation de l'annotation des attributs
