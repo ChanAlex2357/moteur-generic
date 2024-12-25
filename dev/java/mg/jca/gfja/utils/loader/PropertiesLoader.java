@@ -2,18 +2,19 @@ package mg.jca.gfja.utils.loader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Properties;
 
 import mg.jca.gfja.constants.PathConstant;
 
 public class PropertiesLoader {
-    private static Properties properties = new Properties();
+    private static Properties properties;
 
     protected static void setProperties() throws Exception {
+        System.out.println("Setting properties ...");
         Properties  properties = new Properties();
         try (FileInputStream input = new FileInputStream(System.getProperty("user.dir") + java.io.File.separator + PathConstant.RESSOURCE_PATH + java.io.File.separator + PathConstant.PROPERTIES_FILE)) {
             properties.load(input);
+            setProperties(properties);
         } catch (IOException e) {
             throw new Exception("Error while loading properties file", e);
         }
