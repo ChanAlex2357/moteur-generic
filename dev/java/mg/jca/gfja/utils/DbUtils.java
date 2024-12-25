@@ -8,16 +8,25 @@ import mg.jca.gfja.utils.loader.PropertiesLoader;
 public class DbUtils {
     
     public Connection getConn(String user, String pass) throws Exception {
-        if (user == null) {
-            user = getUSER();
+        Connection conn = null;
+        try {
+            if (user == null) {
+                user = getUSER();
+            }
+            if (pass == null) {
+                pass = getPASS();
+            }
+            if (user == null || pass == null) {
+                throw new SQLException("User or password is null");
+            }
+            conn = DriverManager.getConnection(getDbUrl(), user, pass);
+            System.out.println("Connection established succesfully !");
+            
+        } catch (Exception e) {
+            System.out.println("Error while loading connection ...");
+            e.printStackTrace();
         }
-        if (pass == null) {
-            pass = getPASS();
-        }
-        if (user == null || pass == null) {
-            throw new SQLException("User or password is null");
-        }
-        return DriverManager.getConnection(getDbUrl(), user, pass);
+        return conn;
     }
 
     public Connection getConn() throws Exception {
@@ -33,6 +42,9 @@ public class DbUtils {
 
     public String getDbUrl() throws Exception {
         return PropertiesLoader.getProperty("db.url");
+    }
+    public String getDriver() throws Exception {
+        return PropertiesLoader.getProperty("db.driver");
     }
 }
 
