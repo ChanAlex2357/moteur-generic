@@ -1,7 +1,6 @@
 <project name="JavaProject" default="deploy" basedir=".">
     <property name="bin.dir" value="bin"/>
     <property name="res.dir" value="dev/resources"/>
-    <property name="config.dir" value="dev/config"/>
     <property name="deploy.dir" value="build"/>
     <property name="jar.name" value="gfja.jar"/>
     <property name="deploy-lib" value="E:\Personal Project\GFJA\test-moteur\lib"/>
@@ -12,19 +11,8 @@
         <delete file="${deploy.dir}/${jar.name}"/>
     </target>
 
-    <!-- Copy resources -->
-    <target name="copy-resources">
-        <echo message="Copying resources and configuration files..."/>
-        <copy todir="${bin.dir}">
-            <fileset dir="${res.dir}" includes="**/*"/>
-        </copy>
-        <copy todir="${bin.dir}">
-            <fileset dir="${config.dir}" includes="**/*"/>
-        </copy>
-    </target>
-
     <!-- Package task -->
-    <target name="package" depends="copy-resources">
+    <target name="package">
         <echo message="Creating JAR file..."/>
         <jar destfile="${deploy.dir}/${jar.name}" basedir="${bin.dir}"/>
     </target>
