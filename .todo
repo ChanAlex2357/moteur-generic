@@ -8,3 +8,23 @@
   - [x]  Compilation du projet
   - [x]  Compression en jar
   - [x]  Copier vers le dossier de dployement
+
+## ENTITY
+
+[ ] Annotations
+    [ ] class (entity)
+        [ ] props name
+    [ ] attributs (Attribute)
+        [ ] props name
+    [ ] attributs  (Id)
+[ ] Manipulation des annotations
+    [ ] Class AnnotationUtils
+        [ ] Extraction des annotations GFJA
+        [x] isEntity(Class) -> Annotation
+            [x] Verifie si il y a l'annotation Entity
+        [x] isAttribute(Field) -> Annotation
+        [x] isId(Field) -> Annotation
+        [x] getId(Class) -> Field
+[ ] Documentation
+    [ ] l'utilisation de l'annotation des class
+    [ ] l'utiilisation de l'annotation des attributs

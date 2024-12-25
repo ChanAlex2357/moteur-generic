@@ -1,5 +1,7 @@
 # moteur-generic
 
+## Introduction
+
 Le projet 'GFJA' vise a cree un framework java pour le developpement d'application en java
 Il a pour principales but:
 
@@ -16,5 +18,12 @@ Dans le dossier source de la libraire un fichier de deployement est mise a dispo
 
 ### Requirements
 
-Il faut avoir prealablement installer ant ( https://ant.apache.org ) pour deployer le jar apartir du fichier deploy.xml
-<code>ant -f deploy.xml</code>
+Il faut avoir prealablement installer ant (<https://ant.apache.org>) pour deployer le jar apartir du fichier deploy.xml
+
+```sh
+ant -f deploy.xml
+```
+
+## Usage
+
+Pour commencer a utiliser la librairie dans votre projet veuillez consulter [la documentation d'utilisation](./Usage.md)
