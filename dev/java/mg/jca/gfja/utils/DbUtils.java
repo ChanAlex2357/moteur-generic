@@ -7,8 +7,11 @@ import java.sql.SQLException;
 import mg.jca.gfja.utils.loader.ProjectPropertyLoader;
 
 public class DbUtils {
-    public static ProjectPropertyLoader projectProperty = null;
-    public Connection getConn(String user, String pass)  {
+    private static ProjectPropertyLoader projectProperty = null;
+    private static String USER = null;
+    private static String PASS = null;
+    private static String URL = null;
+    private Connection getConn(String user, String pass)  {
         Connection conn = null;
         try {
             if (user == null || pass == null) {
@@ -25,25 +28,32 @@ public class DbUtils {
     public Connection getConn()  {
         return getConn(getUSER(), getPASS());
     }
-    public String getUSER()  {
-        return projectProperty.getProperty("db.user");
+    private String getUSER()  {
+        if (DbUtils.USER == null) {
+            DbUtils.USER =getProjectProperty().getProperty("db.user");
+        }
+        return DbUtils.USER;
     }
 
-    public String getPASS() {
-        return projectProperty.getProperty("db.pass");
+    private String getPASS() {
+        if (DbUtils.PASS == null) {
+            DbUtils.PASS = getProjectProperty().getProperty("db.pass");
+        }
+        return DbUtils.PASS;
     }
 
-    public String getDbUrl()  {
-        return projectProperty.getProperty("db.url");
-    }
-    public String getDriver()  {
-        return projectProperty.getProperty("db.driver");
+    private String getDbUrl()  {
+        if (DbUtils.URL == null) {
+            DbUtils.URL = getProjectProperty().getProperty("db.url");
+
+        }
+        return DbUtils.URL;
     }
 
-    public static ProjectPropertyLoader getProjectProperty(){
+    private static ProjectPropertyLoader getProjectProperty(){
         if (DbUtils.projectProperty ==  null) {
             try {
-                DbUtils.projectProperty = new ProjectPropertyLoader();
+                setProjectProperty(new ProjectPropertyLoader());
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(0);
@@ -52,7 +62,7 @@ public class DbUtils {
         return projectProperty;
     }
 
-    public static void setProjectProperty(ProjectPropertyLoader projectProperty) {
+    private static void setProjectProperty(ProjectPropertyLoader projectProperty) {
         DbUtils.projectProperty = projectProperty;
     }
 }
