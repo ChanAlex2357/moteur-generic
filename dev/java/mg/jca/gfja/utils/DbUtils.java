@@ -3,11 +3,12 @@ package mg.jca.gfja.utils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import mg.jca.gfja.utils.loader.PropertiesLoader;
+
+import mg.jca.gfja.utils.loader.ProjectPropertyLoader;
 
 public class DbUtils {
-    
-    public Connection getConn(String user, String pass) throws Exception {
+    public static ProjectPropertyLoader projectProperty = null;
+    public Connection getConn(String user, String pass)  {
         Connection conn = null;
         try {
             if (user == null) {
@@ -27,22 +28,38 @@ public class DbUtils {
         return conn;
     }
 
-    public Connection getConn() throws Exception {
+    public Connection getConn()  {
         return getConn(getUSER(), getPASS());
     }
-    public String getUSER() throws Exception {
-        return PropertiesLoader.getProperty("db.user");
+    public String getUSER()  {
+        return projectProperty.getProperty("db.user");
     }
 
-    public String getPASS() throws Exception{
-        return PropertiesLoader.getProperty("db.pass");
+    public String getPASS() {
+        return projectProperty.getProperty("db.pass");
     }
 
-    public String getDbUrl() throws Exception {
-        return PropertiesLoader.getProperty("db.url");
+    public String getDbUrl()  {
+        return projectProperty.getProperty("db.url");
     }
-    public String getDriver() throws Exception {
-        return PropertiesLoader.getProperty("db.driver");
+    public String getDriver()  {
+        return projectProperty.getProperty("db.driver");
+    }
+
+    public static ProjectPropertyLoader getProjectProperty(){
+        if (DbUtils.projectProperty ==  null) {
+            try {
+                DbUtils.projectProperty = new ProjectPropertyLoader();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(0);
+            }
+        }
+        return projectProperty;
+    }
+
+    public static void setProjectProperty(ProjectPropertyLoader projectProperty) {
+        DbUtils.projectProperty = projectProperty;
     }
 }
 
