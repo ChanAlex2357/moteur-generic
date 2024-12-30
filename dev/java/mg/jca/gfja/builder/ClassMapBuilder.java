@@ -8,7 +8,7 @@ import mg.jca.gfja.mapping.ClassMap;
 
 public class ClassMapBuilder {
     
-    public ClassMap getClassMap(ClassMap baseClass, ResultSet resultSet , Champ[] baseChamps) throws Exception {
+    public static ClassMap build(ClassMap baseClass, ResultSet resultSet , Champ[] baseChamps) throws Exception {
         ClassMap classMapInstance = null;
         try {
             classMapInstance = baseClass.getClass().getConstructor().newInstance();

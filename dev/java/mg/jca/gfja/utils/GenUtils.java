@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import mg.jca.gfja.builder.ClassMapBuilder;
 import mg.jca.gfja.mapping.Champ;
 import mg.jca.gfja.mapping.ClassMap;
 
@@ -19,7 +20,8 @@ public class GenUtils {
         try (PreparedStatement pStatement = conn.prepareStatement(query)) {
             classMap.mapValues(champs, pStatement);
             try (ResultSet resultSet = pStatement.executeQuery()) {
-            // Conversion des resultats en ClassMap
+                // Conversion des resultats en ClassMap
+                castResult(classMap, champs, resultSet);
             } catch (Exception e) {
                 throw e;
             }
@@ -44,7 +46,7 @@ public class GenUtils {
     protected ClassMap[] castResult(ClassMap classMap , Champ[] champs , ResultSet resultSet) throws Exception{
         List<ClassMap> classMaps = new ArrayList<>();
         while (resultSet.next()) {
-            
+            classMaps.add(ClassMapBuilder.build(classMap, resultSet, champs));
         }
         return classMaps.toArray(new ClassMap[0]);
     }
