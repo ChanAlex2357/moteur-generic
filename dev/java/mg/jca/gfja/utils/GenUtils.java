@@ -39,6 +39,7 @@ public class GenUtils {
     protected String buildWhereClause(String query , Champ[] champs ) {
         String where = " WHERE 1=1 ";
         for (Champ champ : champs) {
+            if (champ.isNull()) {continue;}
             where += "AND "+champ.getName()+" = ? ";
         }
         return where;

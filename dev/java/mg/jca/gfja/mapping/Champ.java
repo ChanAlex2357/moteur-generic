@@ -31,6 +31,18 @@ public class Champ {
     
     private void setValue() throws IllegalArgumentException, IllegalAccessException {
         Object value = getValueFromParent();
+        try {
+            if (getFieldType().equals(String.class) && value == "") {
+                nullState();
+            }
+            else if (getFieldType().equals(Integer.class ) || getFieldType().equals(Double.class)) {
+                if ((Double)value == 0) {
+                    nullState();
+                }
+            }
+        } catch (Exception e) {
+            nullState();
+        }
         this.setValue(value);
     }
         
@@ -57,6 +69,7 @@ public class Champ {
     private Class<?> fieldType;
     private Object value;
     private boolean primarykey = false;
+    private boolean isNull = false;
 
     public Annotation getAttributeAnnotation() {
         return attributeAnnotation;
@@ -172,4 +185,14 @@ public class Champ {
     public Object getValueFromResultSet(ResultSet resultSet) throws SQLException{
         return resultSet.getObject(this.getName());
     }
+
+    public boolean isNull() {
+        return isNull;
+    }
+
+    public void setNull(boolean isNull) {
+        this.isNull = isNull;
+    }
+
+    private void nullState(){setNull(true);}
 }
