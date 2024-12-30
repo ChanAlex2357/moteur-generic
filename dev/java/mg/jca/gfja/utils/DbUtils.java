@@ -11,12 +11,6 @@ public class DbUtils {
     public Connection getConn(String user, String pass)  {
         Connection conn = null;
         try {
-            if (user == null) {
-                user = getUSER();
-            }
-            if (pass == null) {
-                pass = getPASS();
-            }
             if (user == null || pass == null) {
                 throw new SQLException("User or password is null");
             }
