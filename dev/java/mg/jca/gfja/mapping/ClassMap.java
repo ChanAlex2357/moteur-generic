@@ -80,16 +80,16 @@ public abstract class ClassMap {
     }
 
     public void mapValues(Champ[] champs , PreparedStatement preparedStatement) throws SQLException {
+        mapValues(champs, preparedStatement, true);
+    }
+
+    public void mapValues(Champ[] champs , PreparedStatement preparedStatement,boolean acceptNull) throws SQLException {
         int num = 1;
         for (Champ champ : champs) {
             Object value = champ.getValue();
+            if (!acceptNull && champ.isNull()) {continue;}
             preparedStatement.setObject(num,value);
             num +=1;
-        }
-    }
-    public void mapValues(Object[] values , PreparedStatement preparedStatement) throws SQLException {
-        for (int i = 0; i < values.length; i++) {
-            preparedStatement.setObject(i+1,values[i]);
         }
     }
 

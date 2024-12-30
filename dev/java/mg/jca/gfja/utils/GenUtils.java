@@ -18,7 +18,7 @@ public class GenUtils {
         /// Executer la requete
         String query = buildSelectQuery(table, champs, afterWhere);
         try (PreparedStatement pStatement = conn.prepareStatement(query)) {
-            classMap.mapValues(champs, pStatement);
+            classMap.mapValues(champs, pStatement,false);
             try (ResultSet resultSet = pStatement.executeQuery()) {
                 // Conversion des resultats en ClassMap
                 castResult(classMap, champs, resultSet);
