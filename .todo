@@ -33,4 +33,8 @@
 
 [ ] Execution de requete
     [x] Insertion d'une entite
+    [ ] Recuperation de donnee
+        [ ] Select
+        [ ] Pagination
     [ ] Update entite
+    [ ] Delete

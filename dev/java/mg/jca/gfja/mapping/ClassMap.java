@@ -62,7 +62,7 @@ public abstract class ClassMap {
                 post = ",";
             }
             cols += champ.getName() +post;
-            preparedValues += "?"+post;
+            preparedValues += "?"+post; 
         }
         cols += ")";
         preparedValues += ")";
@@ -73,6 +73,8 @@ public abstract class ClassMap {
         try (PreparedStatement preparedStatement = conn.prepareStatement(query);) {
             mapValues(champs, preparedStatement);
             inserted = preparedStatement.executeUpdate();
+        }catch (Exception e) {
+            throw new Exception("Erreur lors de l'execution de la requete d'insertion de l'entite '"+tableName+"' : "+e.getMessage());
         }
         return inserted;
     }
@@ -85,19 +87,20 @@ public abstract class ClassMap {
             num +=1;
         }
     }
+    public void mapValues(Object[] values , PreparedStatement preparedStatement) throws SQLException {
+        for (int i = 0; i < values.length; i++) {
+            preparedStatement.setObject(i+1,values[i]);
+        }
+    }
 
     public abstract void controle(Connection conn) throws Exception; 
 
-    public ClassMap createObject(Connection conn) throws Exception{
+    public ClassMap save(Connection conn) throws Exception{
         // Controlle des donnees
         controle(conn);
         // Insertion des donnee
         insertEntity(conn);
         return this;
-    }
-
-    public static ClassMap createObject(ClassMap classMap , Connection conn) throws Exception {
-        return classMap.createObject(conn);
     }
 
     public static Champ[] getChamps(ClassMap classMap) throws IllegalAccessException, ViolationPrimaryKeyException {
@@ -107,6 +110,26 @@ public abstract class ClassMap {
             try {
                 champ = new Champ(classMap,field);
                 champs.add(champ);        
+            } catch (NotChampException e) {
+                // Skip for not a champ
+                continue;
+            } catch (IllegalArgumentException e) {
+                throw e;
+            } catch (IllegalAccessException e) {
+                throw e;
+            }
+        }
+        return champs.toArray(new Champ[0]);
+    }
+    public static Champ[] getChampsNotNull(ClassMap classMap) throws IllegalAccessException, ViolationPrimaryKeyException {
+        List<Champ> champs = new ArrayList<Champ>();
+        for (Field field : AttributeUtils.getAttributes(classMap.getClass())) {
+            Champ champ;
+            try {
+                champ = new Champ(classMap,field);
+                if (champ.getValue() != null) {
+                    champs.add(champ);        
+                }
             } catch (NotChampException e) {
                 // Skip for not a champ
                 continue;
@@ -142,5 +165,9 @@ public abstract class ClassMap {
     }
     public void setIdChamp(Champ idChamp) {
         this.idChamp = idChamp;
+    }
+
+    public String getEntityName() {
+        return EntityUtils.getEntityName(this);
     }
 }

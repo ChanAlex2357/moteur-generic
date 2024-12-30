@@ -2,10 +2,13 @@ package mg.jca.gfja.mapping;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.lang.annotation.Annotation;
 
 import mg.jca.gfja.annotations.Id;
 import mg.jca.gfja.exception.dao.NotChampException;
+import mg.jca.gfja.exception.dao.NotCompatibleClassMapException;
 import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
 import mg.jca.gfja.utils.AttributeUtils;
 
@@ -101,16 +104,31 @@ public class Champ {
     }
 
     public Object getValueFromParent() throws IllegalArgumentException, IllegalAccessException{
-        field.setAccessible(true);
+        setAccessibleField();
         Object value = field.get(this.getParentObject());
-        field.setAccessible(false);
+        setUnaccessibleField();
         return value;
+    }
+    public void setValueToClassMap(ClassMap classMap,Object value) throws NotCompatibleClassMapException, IllegalArgumentException, IllegalAccessException{
+        if (!classMap.getClass().equals( this.getParentClass()) ) {
+            throw new NotCompatibleClassMapException("Champ.setValueToClassMap pour inserer une valeur de champ dans une classMap", this.getParentObject(),classMap);
+        }
+        setAccessibleField();
+        this.getField().set(classMap,value);
+        setUnaccessibleField();
     }
     
     private void setValueToParent() throws IllegalArgumentException, IllegalAccessException {
-        field.setAccessible(true);
+        setAccessibleField();
         this.getField().set(parentObject, this.getValue());
-        field.setAccessible(false);
+        setUnaccessibleField();
+    }
+
+    private void setAccessibleField(){
+        this.getField().setAccessible(true);
+    }
+    private void setUnaccessibleField(){
+        this.getField().setAccessible(true);
     }
     private void setValue(Object value) {
         this.value = value;
@@ -136,6 +154,9 @@ public class Champ {
     }
 
     public void setParentClass(Class<?> parentClass) {
+        if (this.parentClass == null) {
+            this.parentClass = this.parentObject.getClass();
+        }
         this.parentClass = parentClass;
     }
 
@@ -146,5 +167,9 @@ public class Champ {
     public void setParentObject(ClassMap parentObject) {
         this.parentObject = parentObject;
         setParentClass(parentObject.getClass());
+    }
+
+    public Object getValueFromResultSet(ResultSet resultSet) throws SQLException{
+        return resultSet.getObject(this.getName());
     }
 }
