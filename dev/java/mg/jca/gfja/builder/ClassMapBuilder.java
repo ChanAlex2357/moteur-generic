@@ -13,7 +13,7 @@ public class ClassMapBuilder {
         try {
             classMapInstance = baseClass.getClass().getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException e) {
+        | NoSuchMethodException | SecurityException e) {
             throw new Exception("Erreur lors de la creation d'une instance de la class "+baseClass.getClass()+" pour recupere une ligne de resultset; Veuillez verifier si la class implemente bien un constructeur vide");
         }
         for (Champ champ : baseChamps) {
@@ -21,5 +21,9 @@ public class ClassMapBuilder {
             champ.setValueToClassMap(classMapInstance, value);
         }
         return classMapInstance;
+    }
+    
+    public static ClassMap buildInstance(ClassMap source) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        return source.getClass().getConstructor().newInstance();
     }
 }
