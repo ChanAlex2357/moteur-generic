@@ -48,7 +48,7 @@ public abstract class ClassMap {
             Object pkValue = this.getIdChamp().getValue(); 
             if ( pkValue == null) {
                 String pk = this.makePK(conn);
-                setId(pk);
+                setIdValue(pk);
             }
         } catch (Exception e) {
             // idChamp null
@@ -167,7 +167,7 @@ public abstract class ClassMap {
     }
 
     public Champ getIdChamp() throws Exception{
-        return idChamp;
+        return this.idChamp;
     }
     public void setIdChamp(Champ idChamp) {
         this.idChamp = idChamp;
@@ -177,27 +177,35 @@ public abstract class ClassMap {
         return EntityUtils.getEntityName(this);
     }
 
-    public static ClassMap getById(ClassMap classMap , String id , Connection conn) throws Exception{
-        ClassMap ref = classMap.getNewInstance();
-        ref.setId(id);
-        ClassMap[] results =  new GenUtils().searchEntities(ref,null,conn);
-        if (results.length > 0 ) {
-            return results[0];
+    @SuppressWarnings("unchecked")
+    public static <T extends ClassMap> T getById(T classMap, String id, Connection conn) throws Exception {
+        T ref = (T) classMap.getNewInstance();
+        ref.setIdValue(id);
+        ClassMap[] results = new GenUtils().searchEntities(ref, null, conn);
+        if (results.length > 0) {
+            return (T) results[0];
         }
         return null;
     }
-    public ClassMap getById(Connection conn) throws Exception{
-        return ClassMap.getById(this,this.getId(), conn);
+
+    @SuppressWarnings("unchecked")
+    public <T extends ClassMap> T getById(Connection conn) throws Exception {
+        try {
+            return (T) ClassMap.getById(this, this.getIdValue(), conn);
+        } catch (Exception e) {
+            getChamps();
+            return (T) ClassMap.getById(this, this.getIdValue(), conn);
+        }
     }
 
-    public String getId() throws Exception{
+    public String getIdValue() throws Exception{
         return (String)this.getIdChamp().getValue();
     }
     public ClassMap getNewInstance() throws Exception{
         return ClassMapBuilder.buildInstance(this);
     }
 
-    public void setId(String id) throws Exception{
+    public void setIdValue(String id) throws Exception{
         if (getIdChamp() == null) {
             getChamps();
         }
@@ -206,8 +214,9 @@ public abstract class ClassMap {
             idChamp.setValue(id);
         }
     }
-    public ClassMap[] getAll(Connection conn) throws Exception  {
-        ClassMap[] all = new GenUtils().searchEntities( getNewInstance() ,null, conn);
-        return all;
+    @SuppressWarnings("unchecked")
+    public <T extends ClassMap> T[] getAll(Connection conn) throws Exception {
+        ClassMap[] all = new GenUtils().searchEntities(getNewInstance(), null, conn);
+        return (T[]) all;
     }
 }

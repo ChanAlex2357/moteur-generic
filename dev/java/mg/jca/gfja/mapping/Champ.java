@@ -14,7 +14,9 @@ import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
 import mg.jca.gfja.utils.AttributeUtils;
 
 public class Champ {
-    
+    public String isNullString(){
+        return this.getName()+" : "+this.isNull();
+    }
     
     public Champ( ClassMap source,Field field) throws Exception {
         // recuperer le nom du champ
@@ -25,6 +27,7 @@ public class Champ {
         }
         setAttributeAnnotation(attributeAnnotation);
         setField(field);
+
         setName();
         setPrimarykey();
         setValue();
@@ -32,29 +35,13 @@ public class Champ {
     
     private void setValue() throws Exception {
         Object value = getValueFromParent();
-        try {
-            if (getFieldType().equals(String.class) && (value == null || value == "")) {
-                nullState();
-            }
-            else if (getFieldType().equals(Integer.class ) || getFieldType().equals(Double.class)) {
-                if ((Double)value == 0) {
-                    nullState();
-                }
-            }
-            else if (getFieldType().equals( int.class ) || getFieldType().equals(double.class)) {
-                if ((Double)value == 0) {
-                    nullState();
-                }
-            }
-        } catch (Exception e) {
-            nullState();
-        }
         this.setValue(value);
     }
         
     protected void setPrimarykey() throws Exception{
         Champ id = this.getParentObject().getIdChamp();
         
+        // System.out.println("ID CHAMPPPPPPP : ");
         if (this.getAttributeAnnotation() instanceof Id && id == null) {
             makePrimaryKey();
             this.getParentObject().setIdChamp(this);
@@ -62,6 +49,7 @@ public class Champ {
         else if (this.getAttributeAnnotation() instanceof Id && id != null) {
             throw new ViolationPrimaryKeyException(id, this);
         }
+        // System.out.println("PRIMARY : "+this.isPrimarykey());
     }
     protected void makePrimaryKey() {
         this.primarykey = true;
@@ -92,6 +80,7 @@ public class Champ {
     public void setField(Field field) {
         this.field = field;
         setFieldType(field.getType());
+        // System.out.println("SET FIELD : "+this.getField());
     }
     
     public void setName(){
@@ -124,6 +113,7 @@ public class Champ {
 
     public Object getValueFromParent() throws IllegalArgumentException, IllegalAccessException{
         setAccessibleField();
+        // System.out.println("FIELD :"+this.getField());
         Object value = field.get(this.getParentObject());
         setUnaccessibleField();
         return value;
@@ -150,16 +140,22 @@ public class Champ {
         this.getField().setAccessible(true);
     }
     protected void setValue(Object value) throws Exception{
+        this.value = value;
+        controleParentValue();
+        switchNullState();
+    }
+    protected void controleParentValue() throws Exception {
         Object parentValue = getValueFromParent();
         try {
             if (!parentValue.equals(value)) {
                 setValueToParent();
-                System.out.println("Update "+this.getName()+" value on "+this.getParentObject());
+                // System.out.println("Update "+this.getName()+" value on "+this.getParentObject());
             }
         } catch (NullPointerException e) { 
-            // No value on parent object 
+            if (value != null) {
+                setValueToParent();
+            }
         }
-        this.value = value;
     }
 
     public boolean isPrimarykey() {
@@ -216,4 +212,35 @@ public class Champ {
     }
 
     private void nullState(){setNull(true);}
+    private void notNullState(){setNull(false);}
+    private void switchNullState(){
+        if (getValue() == null) {
+            nullState();
+            return;        
+        }
+        else {
+            notNullState();
+        }
+        try {
+            if (getFieldType().equals(String.class) && (getValue() == "")) {
+                nullState();
+            }
+            else if (getFieldType().equals(Integer.class ) || getFieldType().equals(Double.class)) {
+                if ((Double)getValue() == 0) {
+                    nullState();
+                }
+            }
+            else if (getFieldType().equals( int.class ) || getFieldType().equals(double.class)) {
+                if ((Double)getValue() == 0) {
+                    nullState();
+                }
+            }
+            else {
+                notNullState();
+            }
+        } catch (Exception e) {
+            nullState();
+        }
+
+    }
 }

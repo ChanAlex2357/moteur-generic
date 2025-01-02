@@ -11,8 +11,8 @@ import mg.jca.gfja.mapping.Champ;
 import mg.jca.gfja.mapping.ClassMap;
 
 public class GenUtils {
-    public ClassMap[] searchEntities(ClassMap classMap , String afterWhere , Connection conn) throws Exception{
-        ClassMap[] results = null;
+    public <T extends ClassMap> T[] searchEntities(ClassMap classMap , String afterWhere , Connection conn) throws Exception{
+        T[] results = null;
         String  table = classMap.getEntityName();
         Champ[] champs = classMap.getChamps();
         /// Executer la requete
@@ -45,23 +45,26 @@ public class GenUtils {
     protected String buildWhereClause(String query , Champ[] champs ) {
         String where = " WHERE 1=1 ";
         for (Champ champ : champs) {
-            if (champ.isNull()) {continue;}
+            if (champ.isNull()) {
+                continue;
+            }
             where += buildPreparedWhere(champ);
         }
         return where;
     }
     protected String buildPreparedWhere(Champ champ){
-        return buildSimpleWhere("AND ", champ.getName()," = ","?");
+        return buildSimpleWhere("AND ", champ.getName()," = ","? ");
     }
     protected String buildSimpleWhere(String pre ,String condField ,String condition , String value){
         return pre+condField+condition+value;
     }
-    protected ClassMap[] castResult(ClassMap classMap , Champ[] champs , ResultSet resultSet) throws Exception{
+    @SuppressWarnings("unchecked")
+    protected <T extends ClassMap> T[] castResult(ClassMap classMap , Champ[] champs , ResultSet resultSet) throws Exception{
         List<ClassMap> classMaps = new ArrayList<>();
         while (resultSet.next()) {
             classMaps.add(ClassMapBuilder.build(classMap, resultSet, champs));
         }
-        return classMaps.toArray(new ClassMap[0]);
+        return (T[]) classMaps.toArray(new ClassMap[0]);
     }
     public ClassMap[] castResult(ClassMap classMap , ResultSet resultSet) throws Exception{
         return castResult(classMap,classMap.getChamps(),resultSet);

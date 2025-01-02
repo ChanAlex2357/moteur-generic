@@ -8,13 +8,14 @@ import mg.jca.gfja.mapping.ClassMap;
 
 public class ClassMapBuilder {
     
-    public static ClassMap build(ClassMap baseClass, ResultSet resultSet , Champ[] baseChamps) throws Exception {
-        ClassMap classMapInstance = null;
+    @SuppressWarnings("unchecked")
+    public static <T extends ClassMap> T build(T baseClass, ResultSet resultSet, Champ[] baseChamps) throws Exception {
+        T classMapInstance;
         try {
-            classMapInstance = baseClass.getClass().getConstructor().newInstance();
+            classMapInstance = (T) baseClass.getClass().getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
         | NoSuchMethodException | SecurityException e) {
-            throw new Exception("Erreur lors de la creation d'une instance de la class "+baseClass.getClass()+" pour recupere une ligne de resultset; Veuillez verifier si la class implemente bien un constructeur vide");
+            throw new Exception("Erreur lors de la creation d'une instance de la class " + baseClass.getClass() + " pour recupere une ligne de resultset; Veuillez verifier si la class implemente bien un constructeur vide");
         }
         for (Champ champ : baseChamps) {
             Object value = champ.getValueFromResultSet(resultSet);
@@ -23,7 +24,17 @@ public class ClassMapBuilder {
         return classMapInstance;
     }
     
-    public static ClassMap buildInstance(ClassMap source) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-        return source.getClass().getConstructor().newInstance();
+    @SuppressWarnings("unchecked")
+    public static <T extends ClassMap> T buildInstance(T source) throws Exception {
+        return (T) source.getClass().getConstructor().newInstance();
+    }
+
+    public static <T extends ClassMap> T buildInstance(Class<T> source) throws Exception {
+        return source.getConstructor().newInstance();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends ClassMap> T buildInstance(String className) throws Exception {
+        return buildInstance((Class<T>) Class.forName(className));
     }
 }
