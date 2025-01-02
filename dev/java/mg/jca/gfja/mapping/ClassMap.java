@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mg.jca.gfja.annotations.Id;
+import mg.jca.gfja.builder.ClassMapBuilder;
 import mg.jca.gfja.exception.dao.InsertionEntityException;
 import mg.jca.gfja.exception.dao.NotChampException;
 import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
 import mg.jca.gfja.utils.AttributeUtils;
 import mg.jca.gfja.utils.EntityUtils;
+import mg.jca.gfja.utils.GenUtils;
 import mg.jca.gfja.utils.Utilitaire;
 
 public abstract class ClassMap {
@@ -42,10 +44,15 @@ public abstract class ClassMap {
     }
     
     private void controllerPrimaryKey(Connection conn) throws Exception {
-        Object pkValue = this.getIdChamp().getValue(); 
-        if ( pkValue == null) {
-            String pk = this.makePK(conn);
-            this.getIdChamp().setIdValue(pk);
+        
+        try {
+            Object pkValue = this.getIdChamp().getValue(); 
+            if ( pkValue == null) {
+                String pk = this.makePK(conn);
+                setId(pk);
+            }
+        } catch (Exception e) {
+            // idChamp null
         }
     }
     
@@ -103,7 +110,7 @@ public abstract class ClassMap {
         return this;
     }
 
-    public static Champ[] getChamps(ClassMap classMap) throws IllegalAccessException, ViolationPrimaryKeyException {
+    public static Champ[] getChamps(ClassMap classMap) throws Exception {
         List<Champ> champs = new ArrayList<Champ>();
         for (Field field : AttributeUtils.getAttributes(classMap.getClass())) {
             Champ champ;
@@ -121,7 +128,7 @@ public abstract class ClassMap {
         }
         return champs.toArray(new Champ[0]);
     }
-    public static Champ[] getChampsNotNull(ClassMap classMap) throws IllegalAccessException, ViolationPrimaryKeyException {
+    public static Champ[] getChampsNotNull(ClassMap classMap) throws Exception {
         List<Champ> champs = new ArrayList<Champ>();
         for (Field field : AttributeUtils.getAttributes(classMap.getClass())) {
             Champ champ;
@@ -149,7 +156,7 @@ public abstract class ClassMap {
         return String.valueOf(idAnnotation.seq()) + String.valueOf(nombre);
     }
 
-    public Champ[] getChamps() throws IllegalAccessException, ViolationPrimaryKeyException {
+    public Champ[] getChamps() throws Exception {
         if (this.champs == null) {
             setChamps( ClassMap.getChamps(this));
         }
@@ -160,7 +167,7 @@ public abstract class ClassMap {
         this.champs = champs;
     }
 
-    public Champ getIdChamp() {
+    public Champ getIdChamp() throws Exception{
         return idChamp;
     }
     public void setIdChamp(Champ idChamp) {
@@ -169,5 +176,39 @@ public abstract class ClassMap {
 
     public String getEntityName() {
         return EntityUtils.getEntityName(this);
+    }
+
+    public static ClassMap getById(ClassMap classMap , String id , Connection conn) throws Exception{
+        ClassMap ref = classMap.getNewInstance();
+        ref.setId(id);
+        ClassMap[] results =  new GenUtils().searchEntities(ref,null,conn);
+        if (results.length > 0 ) {
+            return results[0];
+        }
+        return null;
+    }
+    public ClassMap getById(Connection conn) throws Exception{
+        return ClassMap.getById(this,this.getId(), conn);
+    }
+
+    public String getId() throws Exception{
+        return (String)this.getIdChamp().getValue();
+    }
+    public ClassMap getNewInstance() throws Exception{
+        return ClassMapBuilder.buildInstance(this);
+    }
+
+    public void setId(String id) throws Exception{
+        if (getIdChamp() == null) {
+            getChamps();
+        }
+        Champ idChamp = getIdChamp();
+        if (idChamp != null) {
+            idChamp.setValue(id);
+        }
+    }
+    public ClassMap[] getAll(Connection conn) throws Exception  {
+        ClassMap[] all = new GenUtils().searchEntities( getNewInstance() ,null, conn);
+        return all;
     }
 }

@@ -17,11 +17,12 @@ public class GenUtils {
         Champ[] champs = classMap.getChamps();
         /// Executer la requete
         String query = buildSelectQuery(table, champs, afterWhere);
+        System.out.println(query);
         try (PreparedStatement pStatement = conn.prepareStatement(query)) {
             classMap.mapValues(champs, pStatement,false);
             try (ResultSet resultSet = pStatement.executeQuery()) {
                 // Conversion des resultats en ClassMap
-                castResult(classMap, champs, resultSet);
+                results=castResult(classMap, champs, resultSet);
             } catch (Exception e) {
                 throw e;
             }
@@ -30,19 +31,34 @@ public class GenUtils {
         }
         return results;
     }
+
     protected String buildSelectQuery(String table , Champ[] champs , String afterWhere ) {
         String query = "Select * from "+table;
-        String where = buildWhereClause(query, champs) + afterWhere;
+        String collumns = "";
+        for (Champ champ : champs) {
+            collumns += champ.getName();
+        }
+        String where = buildWhereClause(query, champs);
+        if (afterWhere != null) {
+            where += afterWhere;
+        }
         return query+where; 
 
     }
+
     protected String buildWhereClause(String query , Champ[] champs ) {
         String where = " WHERE 1=1 ";
         for (Champ champ : champs) {
             if (champ.isNull()) {continue;}
-            where += "AND "+champ.getName()+" = ? ";
+            where += buildPreparedWhere(champ);
         }
         return where;
+    }
+    protected String buildPreparedWhere(Champ champ){
+        return buildSimpleWhere("AND ", champ.getName()," = ","?");
+    }
+    protected String buildSimpleWhere(String pre ,String condField ,String condition , String value){
+        return pre+condField+condition+value;
     }
     protected ClassMap[] castResult(ClassMap classMap , Champ[] champs , ResultSet resultSet) throws Exception{
         List<ClassMap> classMaps = new ArrayList<>();

@@ -34,7 +34,10 @@
 [ ] Execution de requete
     [x] Insertion d'une entite
     [ ] Recuperation de donnee
-        [ ] Select
+        [x] Select
         [ ] Pagination
     [ ] Update entite
-    [ ] Delete
+[ ] Fonction utilitaire
+    [ ] getById
+    [ ] getMere
+    [ ] getFille

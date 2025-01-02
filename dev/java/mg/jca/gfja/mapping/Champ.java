@@ -2,6 +2,7 @@ package mg.jca.gfja.mapping;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.lang.annotation.Annotation;
@@ -15,7 +16,7 @@ import mg.jca.gfja.utils.AttributeUtils;
 public class Champ {
     
     
-    public Champ( ClassMap source,Field field) throws NotChampException, IllegalArgumentException, IllegalAccessException, ViolationPrimaryKeyException {
+    public Champ( ClassMap source,Field field) throws Exception {
         // recuperer le nom du champ
         Annotation attributeAnnotation = AttributeUtils.isAttribute(field);
         setParentObject(source);
@@ -29,13 +30,18 @@ public class Champ {
         setValue();
     }
     
-    private void setValue() throws IllegalArgumentException, IllegalAccessException {
+    private void setValue() throws Exception {
         Object value = getValueFromParent();
         try {
-            if (getFieldType().equals(String.class) && value == "") {
+            if (getFieldType().equals(String.class) && (value == null || value == "")) {
                 nullState();
             }
             else if (getFieldType().equals(Integer.class ) || getFieldType().equals(Double.class)) {
+                if ((Double)value == 0) {
+                    nullState();
+                }
+            }
+            else if (getFieldType().equals( int.class ) || getFieldType().equals(double.class)) {
                 if ((Double)value == 0) {
                     nullState();
                 }
@@ -46,7 +52,7 @@ public class Champ {
         this.setValue(value);
     }
         
-    protected void setPrimarykey() throws ViolationPrimaryKeyException{
+    protected void setPrimarykey() throws Exception{
         Champ id = this.getParentObject().getIdChamp();
         
         if (this.getAttributeAnnotation() instanceof Id && id == null) {
@@ -143,15 +149,17 @@ public class Champ {
     private void setUnaccessibleField(){
         this.getField().setAccessible(true);
     }
-    private void setValue(Object value) {
-        this.value = value;
-    }
-    public void setIdValue(Object value) throws IllegalArgumentException, IllegalAccessException{
-        Object idValue = getValueFromParent();
-        if (primarykey && idValue == null && value != null) {
-            this.setValue(value);
-            setValueToParent();
+    protected void setValue(Object value) throws Exception{
+        Object parentValue = getValueFromParent();
+        try {
+            if (!parentValue.equals(value)) {
+                setValueToParent();
+                System.out.println("Update "+this.getName()+" value on "+this.getParentObject());
+            }
+        } catch (NullPointerException e) { 
+            // No value on parent object 
         }
+        this.value = value;
     }
 
     public boolean isPrimarykey() {
@@ -183,6 +191,19 @@ public class Champ {
     }
 
     public Object getValueFromResultSet(ResultSet resultSet) throws SQLException{
+        String colName = this.getName();
+        if (this.getFieldType().equals(String.class)) {
+            return resultSet.getString(colName);
+        }
+        else if (this.getFieldType().equals(double.class) || this.getFieldType().equals(Double.class)) {
+            return resultSet.getDouble(colName);
+        }
+        else if (this.getFieldType().equals(Date.class)){
+            return resultSet.getDate(colName);
+        }
+        else if (this.getFieldType().equals(int.class) ||this.getFieldType().equals(Integer.class)){
+            return resultSet.getInt(colName);
+        }
         return resultSet.getObject(this.getName());
     }
 
