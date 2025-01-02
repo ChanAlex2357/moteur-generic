@@ -34,10 +34,6 @@ public class GenUtils {
 
     protected String buildSelectQuery(String table , Champ[] champs , String afterWhere ) {
         String query = "Select * from "+table;
-        String collumns = "";
-        for (Champ champ : champs) {
-            collumns += champ.getName();
-        }
         String where = buildWhereClause(query, champs);
         if (afterWhere != null) {
             where += afterWhere;

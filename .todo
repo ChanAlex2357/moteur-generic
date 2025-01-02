@@ -38,6 +38,7 @@
         [ ] Pagination
     [ ] Update entite
 [ ] Fonction utilitaire
-    [ ] getById
+    [x] getById
+    [x] getAll
     [ ] getMere
     [ ] getFille

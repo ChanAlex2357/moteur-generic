@@ -12,7 +12,6 @@ import mg.jca.gfja.annotations.Id;
 import mg.jca.gfja.builder.ClassMapBuilder;
 import mg.jca.gfja.exception.dao.InsertionEntityException;
 import mg.jca.gfja.exception.dao.NotChampException;
-import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
 import mg.jca.gfja.utils.AttributeUtils;
 import mg.jca.gfja.utils.EntityUtils;
 import mg.jca.gfja.utils.GenUtils;
