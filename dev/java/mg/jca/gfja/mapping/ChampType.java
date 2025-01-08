@@ -9,14 +9,33 @@ public class ChampType {
     private Annotation attributeAnnotation;
     private Field field;
     private Class<?> fieldType;
-    private Class<?> parentClass;
+    private String name;
+
 
     public ChampType(Field field){
         Annotation attributeAnnotation = AttributeUtils.isAttribute(field);
         setAttributeAnnotation(attributeAnnotation);
         setField(field);
+        setName();
 
     }
+
+    public void setName(){
+        String name  = AttributeUtils.getAttributeName(this.getAttributeAnnotation());
+        if (name == null || name  == "" || name.length() == 0) {
+            name = getField().getName();
+        }
+        setName(name);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
     public Annotation getAttributeAnnotation() {
         return attributeAnnotation;
@@ -44,11 +63,4 @@ public class ChampType {
         this.fieldType = fieldType;
     }
 
-    public Class<?> getParentClass() {
-        return parentClass;
-    }
-
-    public void setParentClass(Class<?> parentClass) {
-        this.parentClass = parentClass;
-    }
 }

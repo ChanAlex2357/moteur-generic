@@ -23,7 +23,6 @@ public class PrimitiveUtils {
                 break;
             }
         }
-        System.out.println("PrimitiveUtils.isPrimitifType() : "+result +" ["+typeOrigin+"]");
         return result;
     }
     public static Object parsePrimitive(Class<?> typeOrigin ,String value){

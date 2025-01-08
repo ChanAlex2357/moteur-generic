@@ -6,8 +6,10 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import mg.jca.gfja.builder.ClassMapBuilder;
 import mg.jca.gfja.mapping.Champ;
+import mg.jca.gfja.mapping.ChampType;
 import mg.jca.gfja.mapping.ClassMap;
 
 public class GenUtils {
@@ -68,5 +70,28 @@ public class GenUtils {
     }
     public ClassMap[] castResult(ClassMap classMap , ResultSet resultSet) throws Exception{
         return castResult(classMap,classMap.getChamps(),resultSet);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ClassMap> T instanceForm(ClassMap classMap,String[] cols,HttpServletRequest request) throws Exception{
+        T instance = null;
+        instance = (T) classMap.getNewInstance();
+        for (String string : cols) {
+            Champ champ = classMap.getChamp(string);
+            if (champ == null) {
+                continue;
+            }
+            champ.setValue(request.getParameter(string));
+        }
+        return instance;
+    }
+
+    public <T extends ClassMap> T instanceForm(ClassMap classMap,HttpServletRequest request) throws Exception{
+        ChampType[] types = classMap.getChampsTypes();
+        String[] cols = new String[types.length];
+        for (int i = 0; i < cols.length; i++) {
+            cols[i] = types[i].getName();
+        }
+        return instanceForm(classMap, cols, request);
     }
 }

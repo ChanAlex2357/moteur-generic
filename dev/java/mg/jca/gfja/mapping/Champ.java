@@ -14,9 +14,7 @@ import mg.jca.gfja.utils.AttributeUtils;
 
 public class Champ {
     ChampType champType ;
-    public String isNullString(){
-        return this.getName()+" : "+this.isNull();
-    }
+    
     
     public Champ( ClassMap source,Field field) throws Exception {
         // recuperer le nom du champ
@@ -25,7 +23,6 @@ public class Champ {
         // if (attributeAnnotation == null ) {
         //     throw new NotChampException(this.getParentClass(),field);
         // }
-        setName();
         setPrimarykey();
         setValue();
     }
@@ -52,9 +49,12 @@ public class Champ {
         this.primarykey = true;
     }
 
+    public String isNullString(){
+        return this.getName()+" : "+this.isNull();
+    }
+    
     private ClassMap parentObject;
     private Class<?> parentClass;
-    private String name;
     private Object value;
     private boolean primarykey = false;
     private boolean isNull = false;
@@ -67,21 +67,8 @@ public class Champ {
         return getChampType().getField();
     }
     
-    public void setName(){
-        String name  = AttributeUtils.getAttributeName(this.getAttributeAnnotation());
-        if (name == null || name  == "" || name.length() == 0) {
-            name = getField().getName();
-        }
-        setName(name);
-    }
+    
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Type getFieldType() {
         return this.getChampType().getFieldType();
@@ -185,6 +172,10 @@ public class Champ {
 
     public boolean isNull() {
         return isNull;
+    }
+
+    public String getName(){
+        return this.getChampType().getName();
     }
 
     public void setNull(boolean isNull) {

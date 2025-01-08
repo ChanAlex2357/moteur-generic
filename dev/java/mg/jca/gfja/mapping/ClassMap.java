@@ -231,6 +231,17 @@ public abstract class ClassMap {
             idChamp.setValue(id);
         }
     }
+
+    public Champ getChamp(String name)throws Exception {
+        Champ[] champs = getChamps();
+        for (Champ champ : champs) {
+            if (champ.getName().equals(name)) {
+                return champ;
+            }   
+        }
+        return null;
+    }
+    
     @SuppressWarnings("unchecked")
     public <T extends ClassMap> T[] getAll(Connection conn) throws Exception {
         ClassMap[] all = new GenUtils().searchEntities(getNewInstance(), null, conn);
@@ -238,6 +249,4 @@ public abstract class ClassMap {
         System.arraycopy(all, 0, result, 0, all.length);
         return result;
     }
-
-    
 }
