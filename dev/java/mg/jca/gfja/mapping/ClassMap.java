@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import mg.jca.gfja.annotations.Id;
 import mg.jca.gfja.builder.ClassMapBuilder;
 import mg.jca.gfja.exception.dao.InsertionEntityException;
@@ -20,6 +19,7 @@ import mg.jca.gfja.utils.Utilitaire;
 
 public abstract class ClassMap {
     protected Champ[] champs;
+    protected ChampType[] champsTypes;
     protected Champ idChamp;
     protected String deafaultSeq;
     protected String defaultProcedure;
@@ -81,7 +81,7 @@ public abstract class ClassMap {
             mapValues(champs, preparedStatement);
             inserted = preparedStatement.executeUpdate();
         }catch (Exception e) {
-            throw new Exception("Erreur lors de l'execution de la requete d'insertion de l'entite '"+tableName+"' : "+e.getMessage());
+            throw new Exception("Erreur lors de l'execution de la requete ["+query+"] d'insertion de l'entite '"+tableName+"' : "+e.getMessage());
         }
         return inserted;
     }
@@ -116,6 +116,7 @@ public abstract class ClassMap {
             Champ champ;
             try {
                 champ = new Champ(classMap,field);
+                System.out.println("CHAMP > "+champ.getName());
                 champs.add(champ);        
             } catch (NotChampException e) {
                 // Skip for not a champ
@@ -127,6 +128,21 @@ public abstract class ClassMap {
             }
         }
         return champs.toArray(new Champ[0]);
+    }
+    public ChampType[] getChampsTypes() throws Exception {
+        if (this.champsTypes == null || this.champsTypes.length == 0) {
+            
+        }
+        return ClassMap.getChampsTypes(this);
+    }
+    public static ChampType[] getChampsTypes(ClassMap classMap) throws Exception {
+        List<ChampType> champs = new ArrayList<ChampType>();
+        for (Field field : AttributeUtils.getAttributes(classMap.getClass())) {
+            ChampType champ;
+                champ = new ChampType(field);
+                champs.add(champ);
+        }
+        return champs.toArray(new ChampType[0]);
     }
     public static Champ[] getChampsNotNull(ClassMap classMap) throws Exception {
         List<Champ> champs = new ArrayList<Champ>();
@@ -222,4 +238,6 @@ public abstract class ClassMap {
         System.arraycopy(all, 0, result, 0, all.length);
         return result;
     }
+
+    
 }

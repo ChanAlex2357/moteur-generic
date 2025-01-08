@@ -8,26 +8,23 @@ import java.sql.SQLException;
 import java.lang.annotation.Annotation;
 
 import mg.jca.gfja.annotations.Id;
-import mg.jca.gfja.exception.dao.NotChampException;
 import mg.jca.gfja.exception.dao.NotCompatibleClassMapException;
 import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
 import mg.jca.gfja.utils.AttributeUtils;
 
 public class Champ {
+    ChampType champType ;
     public String isNullString(){
         return this.getName()+" : "+this.isNull();
     }
     
     public Champ( ClassMap source,Field field) throws Exception {
         // recuperer le nom du champ
-        Annotation attributeAnnotation = AttributeUtils.isAttribute(field);
+        setChampType(new ChampType(field));
         setParentObject(source);
-        if (attributeAnnotation == null ) {
-            throw new NotChampException(this.getParentClass(),field);
-        }
-        setAttributeAnnotation(attributeAnnotation);
-        setField(field);
-
+        // if (attributeAnnotation == null ) {
+        //     throw new NotChampException(this.getParentClass(),field);
+        // }
         setName();
         setPrimarykey();
         setValue();
@@ -55,38 +52,25 @@ public class Champ {
         this.primarykey = true;
     }
 
-    private Annotation attributeAnnotation;
     private ClassMap parentObject;
     private Class<?> parentClass;
-    private Field field;
     private String name;
-    private Class<?> fieldType;
     private Object value;
     private boolean primarykey = false;
     private boolean isNull = false;
 
     public Annotation getAttributeAnnotation() {
-        return attributeAnnotation;
-    }
-
-    public void setAttributeAnnotation(Annotation attributeAnnotation) {
-        this.attributeAnnotation = attributeAnnotation;
+        return getChampType().getAttributeAnnotation();
     }
 
     public Field getField() {
-        return field;
-    }
-
-    public void setField(Field field) {
-        this.field = field;
-        setFieldType(field.getType());
-        // System.out.println("SET FIELD : "+this.getField());
+        return getChampType().getField();
     }
     
     public void setName(){
         String name  = AttributeUtils.getAttributeName(this.getAttributeAnnotation());
         if (name == null || name  == "" || name.length() == 0) {
-            name = field.getName();
+            name = getField().getName();
         }
         setName(name);
     }
@@ -100,11 +84,7 @@ public class Champ {
     }
 
     public Type getFieldType() {
-        return fieldType;
-    }
-
-    public void setFieldType(Class<?> fieldType) {
-        this.fieldType = fieldType;
+        return this.getChampType().getFieldType();
     }
 
     public Object getValue() {
@@ -114,7 +94,7 @@ public class Champ {
     public Object getValueFromParent() throws IllegalArgumentException, IllegalAccessException{
         setAccessibleField();
         // System.out.println("FIELD :"+this.getField());
-        Object value = field.get(this.getParentObject());
+        Object value = getField().get(this.getParentObject());
         setUnaccessibleField();
         return value;
     }
@@ -242,5 +222,13 @@ public class Champ {
             nullState();
         }
 
+    }
+
+    public ChampType getChampType() {
+        return champType;
+    }
+
+    public void setChampType(ChampType champType) {
+        this.champType = champType;
     }
 }

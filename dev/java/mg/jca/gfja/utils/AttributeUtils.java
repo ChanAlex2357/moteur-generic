@@ -56,11 +56,15 @@ public class AttributeUtils {
 
     // Get attributes with specified annotations
     public static List<Field> getAttributes(Class<?> clazz) {
-        return AnnotationUtils.getFieldsWithAnnotations(clazz, AnnotationConstants.ATTRIBUTE_ANNOTATIONS);
+        return AnnotationUtils.getPrimitiveFields(clazz,null);
     }
 
     public static String getAttributeName(Annotation annotation) {
         String name = null;
+
+        if (annotation == null) {
+            return name;
+        }
 
         if (annotation instanceof Id) {
             name = ((Id)annotation).name();

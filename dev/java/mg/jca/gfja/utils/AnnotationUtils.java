@@ -30,4 +30,25 @@ public class AnnotationUtils {
         }
         return fields;
     }
+
+    public static List<Field> getPrimitiveFields(Class<?> clazz,List<Class<? extends Annotation>> excluded){
+        List<Field> fields = new ArrayList<>();
+        for (Field field : clazz.getDeclaredFields()) {
+            if (!PrimitiveUtils.isPrimitifType(field)) { break; }
+            else if ( isAnnoted(field,excluded)) { break; }
+            fields.add(field);
+        }
+        return fields;
+    }
+    public static boolean isAnnoted(Field field,List<Class<? extends Annotation>> excluded){
+        if (excluded == null) {
+            return false;
+        }
+        for (Class<? extends Annotation> annotation : excluded) {
+            if (field.isAnnotationPresent(annotation)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
