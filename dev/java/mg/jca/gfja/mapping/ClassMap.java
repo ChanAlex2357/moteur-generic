@@ -1,6 +1,7 @@
 package mg.jca.gfja.mapping;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -217,6 +218,8 @@ public abstract class ClassMap {
     @SuppressWarnings("unchecked")
     public <T extends ClassMap> T[] getAll(Connection conn) throws Exception {
         ClassMap[] all = new GenUtils().searchEntities(getNewInstance(), null, conn);
-        return (T[]) all;
+        T[] result = (T[]) Array.newInstance(getClass(), all.length);
+        System.arraycopy(all, 0, result, 0, all.length);
+        return result;
     }
 }

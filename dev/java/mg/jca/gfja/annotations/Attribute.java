@@ -8,5 +8,5 @@ import java.lang.annotation.RetentionPolicy;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Attribute {
-    String name() default "";    
+    String name();    
 }
