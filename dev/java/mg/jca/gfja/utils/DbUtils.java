@@ -11,13 +11,23 @@ public class DbUtils {
     private static String USER = null;
     private static String PASS = null;
     private static String URL = null;
+    public DbUtils(String url,String user , String pass){
+        this(user, pass);
+        setURL(url);
+    }
+    public DbUtils(String user, String pass) {
+        setUSER(user);
+        setPASS(pass);
+    }
+    public DbUtils(){}
+
     private Connection getConn(String user, String pass)  {
         Connection conn = null;
         try {
             if (user == null || pass == null) {
                 throw new SQLException("User or password is null");
             }
-            conn = DriverManager.getConnection(getDbUrl(), user, pass);
+            conn = DriverManager.getConnection(getUrl(), user, pass);
         } catch (Exception e) {
             System.out.println("Error while loading connection ...");
             e.printStackTrace();
@@ -42,7 +52,7 @@ public class DbUtils {
         return DbUtils.PASS;
     }
 
-    private String getDbUrl()  {
+    private String getUrl()  {
         if (DbUtils.URL == null) {
             DbUtils.URL = getProjectProperty().getProperty("db.url");
 
@@ -64,6 +74,18 @@ public class DbUtils {
 
     private static void setProjectProperty(ProjectPropertyLoader projectProperty) {
         DbUtils.projectProperty = projectProperty;
+    }
+
+    public static void setUSER(String uSER) {
+        USER = uSER;
+    }
+
+    public static void setPASS(String pASS) {
+        PASS = pASS;
+    }
+
+    public static void setURL(String uRL) {
+        URL = uRL;
     }
 }
 

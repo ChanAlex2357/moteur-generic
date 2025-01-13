@@ -116,7 +116,6 @@ public abstract class ClassMap {
             Champ champ;
             try {
                 champ = new Champ(classMap,field);
-                System.out.println("CHAMP > "+champ.getName());
                 champs.add(champ);        
             } catch (NotChampException e) {
                 // Skip for not a champ
@@ -248,5 +247,19 @@ public abstract class ClassMap {
         T[] result = (T[]) Array.newInstance(getClass(), all.length);
         System.arraycopy(all, 0, result, 0, all.length);
         return result;
+    }   
+
+    @Override
+    public String toString() {
+        String string = this.getClass()+" {";
+        try {
+            for (Field field : this.getClass().getDeclaredFields()) {
+                string += "\t"+field.getName()+" : "+field.get(this)+";\n";
+            }
+            string+="} "+super.toString();
+        } catch (Exception e) {
+            string = super.toString();    
+        }
+        return string;
     }
 }

@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import mg.jca.gfja.annotations.Id;
 import mg.jca.gfja.exception.dao.NotCompatibleClassMapException;
 import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
-import mg.jca.gfja.utils.AttributeUtils;
 
 public class Champ {
     ChampType champType ;
@@ -106,7 +105,7 @@ public class Champ {
     private void setUnaccessibleField(){
         this.getField().setAccessible(true);
     }
-    protected void setValue(Object value) throws Exception{
+    public void setValue(Object value) throws Exception{
         this.value = value;
         controleParentValue();
         switchNullState();
