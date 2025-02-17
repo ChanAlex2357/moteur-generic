@@ -24,15 +24,24 @@ public class DbUtils {
     private Connection getConn(String user, String pass)  {
         Connection conn = null;
         try {
-            if (user == null || pass == null) {
-                throw new SQLException("User or password is null");
-            }
-            conn = DriverManager.getConnection(getUrl(), user, pass);
+            conn = getPureConn(user, pass);
         } catch (Exception e) {
             System.out.println("Error while loading connection ...");
             e.printStackTrace();
         }
         return conn;
+    }
+
+    public Connection getPureConn(String user,String pass)throws Exception{
+        Connection conn = null;
+        if (user == null || pass == null) {
+            throw new SQLException("User or password is null");
+        }
+        conn = DriverManager.getConnection(getUrl(), user, pass);
+        return conn;
+    }
+    public Connection getPureConn()throws Exception{
+        return getPureConn(getUSER(), getPASS());
     }
 
     public Connection getConn()  {
@@ -76,16 +85,20 @@ public class DbUtils {
         DbUtils.projectProperty = projectProperty;
     }
 
-    public static void setUSER(String uSER) {
+    private static void setUSER(String uSER) {
         USER = uSER;
     }
 
-    public static void setPASS(String pASS) {
+    private static void setPASS(String pASS) {
         PASS = pASS;
     }
 
-    public static void setURL(String uRL) {
+    private static void setURL(String uRL) {
         URL = uRL;
+    }
+
+    public String str(){
+        return "URL:"+this.getUrl()+" | USER:"+this.getUSER()+" | Pass:"+this.getPASS();
     }
 }
 

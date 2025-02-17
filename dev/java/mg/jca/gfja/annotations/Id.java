@@ -11,5 +11,5 @@ public @interface Id {
     String name() default "";
     String seq();
     String procedure();
-    
+    boolean autoIncrement() default false;
 }
