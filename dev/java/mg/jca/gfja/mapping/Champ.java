@@ -14,14 +14,9 @@ import mg.jca.gfja.exception.dao.ViolationPrimaryKeyException;
 public class Champ {
     ChampType champType ;
     
-    
     public Champ( ClassMap source,Field field) throws Exception {
-        // recuperer le nom du champ
         setChampType(new ChampType(field));
         setParentObject(source);
-        // if (attributeAnnotation == null ) {
-        //     throw new NotChampException(this.getParentClass(),field);
-        // }
         setPrimarykey();
         setValue();
     }
@@ -33,19 +28,17 @@ public class Champ {
         
     protected void setPrimarykey() throws Exception{
         Champ id = this.getParentObject().getIdChamp();
-        
-        // System.out.println("ID CHAMPPPPPPP : ");
         if (this.getAttributeAnnotation() instanceof Id && id == null) {
-            makePrimaryKey();
+            makePrimaryKey((Id) getAttributeAnnotation());
             this.getParentObject().setIdChamp(this);
         }
         else if (this.getAttributeAnnotation() instanceof Id && id != null) {
             throw new ViolationPrimaryKeyException(id, this);
         }
-        // System.out.println("PRIMARY : "+this.isPrimarykey());
     }
-    protected void makePrimaryKey() {
+    protected void makePrimaryKey(Id idAnnotation) {
         this.primarykey = true;
+        setAutoIncrement(idAnnotation.autoIncrement());
     }
 
     public String isNullString(){
@@ -56,6 +49,7 @@ public class Champ {
     private Class<?> parentClass;
     private Object value;
     private boolean primarykey = false;
+    private boolean autoIncrement = false;
     private boolean isNull = false;
 
     public Annotation getAttributeAnnotation() {
@@ -65,9 +59,6 @@ public class Champ {
     public Field getField() {
         return getChampType().getField();
     }
-    
-    
-
 
     public Type getFieldType() {
         return this.getChampType().getFieldType();
@@ -79,7 +70,6 @@ public class Champ {
 
     public Object getValueFromParent() throws IllegalArgumentException, IllegalAccessException{
         setAccessibleField();
-        // System.out.println("FIELD :"+this.getField());
         Object value = getField().get(this.getParentObject());
         setUnaccessibleField();
         return value;
@@ -184,31 +174,35 @@ public class Champ {
     private void nullState(){setNull(true);}
     private void notNullState(){setNull(false);}
     private void switchNullState(){
-        if (getValue() == null) {
-            nullState();
-            return;        
-        }
-        else {
-            notNullState();
-        }
         try {
             if (getFieldType().equals(String.class) && (getValue() == "")) {
                 nullState();
             }
-            else if (getFieldType().equals(Integer.class ) || getFieldType().equals(Double.class)) {
-                if ((Double)getValue() == 0) {
+            else if (getFieldType().equals(Integer.class ) || getFieldType().equals( int.class )) {
+                if (((Integer)getValue()) == 0) {
                     nullState();
+                }
+                else {
+                    notNullState();
                 }
             }
-            else if (getFieldType().equals( int.class ) || getFieldType().equals(double.class)) {
-                if ((Double)getValue() == 0) {
+            else if ( getFieldType().equals(Double.class) || getFieldType().equals(double.class)) {
+                if (((Double)getValue()) == 0.0) {
                     nullState();
                 }
+                else {
+                    notNullState();
+                }
+            }
+            else if (getValue() == null) {
+                nullState();
+                return;        
             }
             else {
                 notNullState();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             nullState();
         }
 
@@ -220,5 +214,13 @@ public class Champ {
 
     public void setChampType(ChampType champType) {
         this.champType = champType;
+    }
+
+    public boolean isAutoIncrement() {
+        return autoIncrement;
+    }
+
+    public void setAutoIncrement(boolean autoIncrement) {
+        this.autoIncrement = autoIncrement;
     }
 }

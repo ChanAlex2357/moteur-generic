@@ -5,6 +5,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +48,17 @@ public abstract class ClassMap {
     private void controllerPrimaryKey(Connection conn) throws Exception {
         
         try {
-            Object pkValue = this.getIdChamp().getValue(); 
-            if ( pkValue == null) {
+            Champ idChamp = this.getIdChamp();
+            Object pkValue = this.getIdChamp().getValue();
+            if (idChamp.isAutoIncrement()) {
+                setIdValue(null);
+            }
+            else if ( pkValue == null) {
                 String pk = this.makePK(conn);
                 setIdValue(pk);
             }
         } catch (Exception e) {
-            // idChamp null
+            throw e;
         }
     }
     
@@ -63,7 +69,7 @@ public abstract class ClassMap {
 
         for (int i = 0; i < champs.length; i++) {
             Champ champ = champs[i];
-            if (champ == null) {continue;}
+            if (champ == null || champ.getValue() == null) {continue;}
             String post = "";
             if (i < champs.length -1) {
                 post = ",";
@@ -74,12 +80,21 @@ public abstract class ClassMap {
         cols += ")";
         preparedValues += ")";
         query += cols+" values "+preparedValues;
-        
-        // System.out.println("INSERT QUERY : "+query);
+
+
         int inserted = 0;
-        try (PreparedStatement preparedStatement = conn.prepareStatement(query);) {
-            mapValues(champs, preparedStatement);
+        try (PreparedStatement preparedStatement = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);) {
+            mapValues(champs, preparedStatement,false);
             inserted = preparedStatement.executeUpdate();
+            Champ idChamp = getIdChamp();
+            if (idChamp.isAutoIncrement()) {
+               ResultSet rs = preparedStatement.getGeneratedKeys();
+               if (rs.next()) {
+                  int generatedId = rs.getInt(1);
+                  System.out.println("Generated ID: " + generatedId);
+                  idChamp.setValue(generatedId);
+               }
+            }
         }catch (Exception e) {
             throw new Exception("Erreur lors de l'execution de la requete ["+query+"] d'insertion de l'entite '"+tableName+"' : "+e.getMessage());
         }
@@ -257,7 +272,7 @@ public abstract class ClassMap {
                 string += "\t"+field.getName()+" : "+field.get(this)+";\n";
             }
             string+="} "+super.toString();
-        } catch (Exception e) {
+        } catch ( Exception e) {
             string = super.toString();    
         }
         return string;

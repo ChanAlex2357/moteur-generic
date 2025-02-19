@@ -13,7 +13,6 @@ public class AttributeUtils {
     public static Annotation isAttribute(Field field) {
         
         Annotation annotation = field.getAnnotation(AnnotationConstants.ATTRIBUTE_ANNOTATION);
-
         if (annotation ==null) {
             annotation = isId(field);
         }

@@ -2,6 +2,7 @@ package mg.jca.gfja.utils;
 
 import java.lang.reflect.Field;
 import java.sql.Date;
+import java.sql.Time;
 
 public class PrimitiveUtils {
     
@@ -11,7 +12,8 @@ public class PrimitiveUtils {
         double.class,
         boolean.class,
         float.class,
-        Date.class
+        Date.class,
+        Time.class
     };
     public static boolean isPrimitifType(Field parameter){
         boolean result = false;
