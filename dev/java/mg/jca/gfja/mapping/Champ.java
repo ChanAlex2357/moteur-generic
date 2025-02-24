@@ -19,6 +19,8 @@ public class Champ {
         setParentObject(source);
         setPrimarykey();
         setValue();
+
+        System.out.println("FIELD : "+this.getName()+" , isNull : "+isNull+" , value : "+getValue());
     }
     
     private void setValue() throws Exception {

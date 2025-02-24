@@ -50,6 +50,9 @@ public abstract class ClassMap {
         try {
             Champ idChamp = this.getIdChamp();
             Object pkValue = this.getIdChamp().getValue();
+            if (pkValue != null) {
+                return;
+            }
             if (idChamp.isAutoIncrement()) {
                 setIdValue(null);
             }
@@ -61,7 +64,12 @@ public abstract class ClassMap {
             throw e;
         }
     }
-    
+    public String clean(String str ) {
+        if (str.endsWith(",")) {
+            str = str.substring(0,str.length()-1);
+        }
+        return str;
+    }
     public int isnertIntoTable(String tableName , Champ[] champs , Connection conn)throws Exception{
         String query = "Insert into "+tableName;
         String cols = "(";
@@ -69,7 +77,10 @@ public abstract class ClassMap {
 
         for (int i = 0; i < champs.length; i++) {
             Champ champ = champs[i];
-            if (champ == null || champ.getValue() == null) {continue;}
+
+            if (champ == null || champ.isNull() || champ.getValue() == null) {
+                continue;
+            }
             String post = "";
             if (i < champs.length -1) {
                 post = ",";
@@ -77,6 +88,10 @@ public abstract class ClassMap {
             cols += champ.getName() +post;
             preparedValues += "?"+post; 
         }
+
+        cols = clean(cols);
+        preparedValues  = clean(preparedValues);
+
         cols += ")";
         preparedValues += ")";
         query += cols+" values "+preparedValues;
@@ -86,6 +101,7 @@ public abstract class ClassMap {
         try (PreparedStatement preparedStatement = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);) {
             mapValues(champs, preparedStatement,false);
             inserted = preparedStatement.executeUpdate();
+
             Champ idChamp = getIdChamp();
             if (idChamp.isAutoIncrement()) {
                ResultSet rs = preparedStatement.getGeneratedKeys();
@@ -95,6 +111,7 @@ public abstract class ClassMap {
                   idChamp.setValue(generatedId);
                }
             }
+
         }catch (Exception e) {
             throw new Exception("Erreur lors de l'execution de la requete ["+query+"] d'insertion de l'entite '"+tableName+"' : "+e.getMessage());
         }
@@ -276,5 +293,57 @@ public abstract class ClassMap {
             string = super.toString();    
         }
         return string;
+    }
+
+    // Nouvelle méthode updateEntity
+    public int updateEntity(Connection conn) throws Exception {
+        Annotation entityAnnotation = EntityUtils.isEntity(this);
+        if (entityAnnotation == null) {
+            throw new Exception("La classe n'est pas une entité.");
+        }
+        String tableName = EntityUtils.getEntityName(this, entityAnnotation);
+        Champ[] champs = getChamps();
+        Champ idChamp = getIdChamp();
+        if (idChamp.getValue() == null) {
+            throw new Exception("La clé primaire est absente, impossible de mettre à jour.");
+        }
+        return updateToTable(tableName, champs, conn);
+    }
+    
+    // Nouvelle méthode updateToTable
+    public int updateToTable(String tableName, Champ[] champs, Connection conn) throws Exception {
+        StringBuilder query = new StringBuilder("UPDATE " + tableName + " SET ");
+        List<Object> values = new ArrayList<>();
+        for (Champ champ : champs) {
+            if (champ == null || champ.isNull() || champ.getValue() == null) {
+                continue;
+            }
+            // Exclure le champ id
+            if (champ.equals(getIdChamp())) {
+                continue;
+            }
+            query.append(champ.getName()).append("=?,");
+            values.add(champ.getValue());
+        }
+        if (values.isEmpty()) {
+            throw new Exception("Aucun champ à mettre à jour.");
+        }
+        // Supprimer la dernière virgule et ajouter la clause WHERE
+        query.deleteCharAt(query.length() - 1);
+        query.append(" WHERE ").append(getIdChamp().getName()).append("=?");
+        values.add(getIdChamp().getValue());
+
+        int updated = 0;
+        try (PreparedStatement ps = conn.prepareStatement(query.toString())) {
+            int index = 1;
+            for (Object val : values) {
+                ps.setObject(index++, val);
+            }
+            updated = ps.executeUpdate();
+        } catch (Exception e) {
+            throw new Exception("Erreur lors de l'execution de la requête [" + query.toString() +
+                    "] de mise à jour de l'entité '" + tableName + "' : " + e.getMessage());
+        }
+        return updated;
     }
 }
